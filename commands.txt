@@ -1,0 +1,2 @@
+ python manage.py makemigrations => to initialise migration
+ python manage.py migrate   => to finalise migration
