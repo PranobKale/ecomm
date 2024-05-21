@@ -9,17 +9,28 @@
     <div class="card">
         <div class="row no-gutters">
             <aside class="col-md-6">
-    <article class="gallery-wrap"> 
-    <div class="img-big-wrap">
-      <div> <a href="#"><img src="/media/{{product.product_image.first.image}}"></a></div>
-    </div> <!-- slider-product.// -->
-    <div class="thumbs-wrap">
-        {% for image in product.product_image.all %}
-      <a href="#" class="item-thumb"> <img src="/media/{{image.image}}"></a>
-
-      {% endfor %}
-    </div> <!-- slider-nav.// -->
-    </article> <!-- gallery-wrap .end// -->
+                <article class="gallery-wrap"> 
+                    <div class="img-big-wrap">
+                      <div> <a href="#"><img id="main-image" src="/media/{{product.product_image.first.image}}"></a></div>
+                    </div> <!-- slider-product.// -->
+                    <div class="thumbs-wrap">
+                      {% for image in product.product_image.all %}
+                      <a href="#" class="item-thumb" onclick="changeImage('/media/{{image.image}}')"> <img src="/media/{{image.image}}"></a>
+                      {% endfor %}
+                    </div> <!-- slider-nav.// -->
+                  </article>
+                  
+                  <script>
+                    function changeImage(newSrc) {
+                      try {
+                        // Update the src attribute of the main image with the new image URL
+                        document.getElementById('main-image').src = newSrc;
+                      } catch (error) {
+                        console.error("Error occurred while changing the image:", error);
+                      }
+                    }
+                  </script>
+                   <!-- gallery-wrap .end// -->
             </aside>
             <main class="col-md-6 border-left">
     <article class="content-body">
@@ -88,7 +99,7 @@
                 <div class="mt-1">
                     {% for size in product.size_variant.all %}
                     <label class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" onchange="get_correct_price('{{ size.size_name }}')" name="select_size" value="{{ size.size_name }}" {% if select_size == size.size_name %} checked {% endif %} class="custom-control-input">
+                        <input type="radio" onchange="get_correct_price('{{ size.size_name }}')" name="select_size" value="{{ size.size_name }}" {% if selected_size == size.size_name %} checked {% endif %} class="custom-control-input">
                         <div class="custom-control-label">{{ size.size_name }}</div>
                     </label>
                     {% endfor %}
@@ -100,7 +111,7 @@
         </div> <!-- row.// -->
     
         <a href="#" class="btn  btn-primary"> Buy now </a>
-        <a href="#" class="btn  btn-outline-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+        <a href="{% url 'add_to_cart' product.uid %}?varient={{selected_size}}" class="btn  btn-outline-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
     </article> <!-- product-info-aside .// -->
             </main> <!-- col.// -->
         </div> <!-- row.// -->
