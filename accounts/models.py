@@ -39,14 +39,15 @@ class Cart(BaseModel):
     def get_cart_total(self):
         cart_items = self.cart_items.all()
         price = []
+        print(cart_items,'cart_items------')
 
         for cart_item in cart_items:
             price.append(cart_item.product.price)
             if cart_item.color_variant:
-                color_varient_price = cart_item.color_varient_price
+                color_varient_price = cart_item.color_variant.price
                 price.append(color_varient_price)
             if cart_item.size_variant:
-                size_varient_price = cart_item.size_varient_price
+                size_varient_price = cart_item.size_variant.price
                 price.append(size_varient_price)
         
         return sum(price)
@@ -61,10 +62,11 @@ class CartItems(BaseModel):
         price = [self.product.price]
 
         if self.color_variant:
-                color_varient_price = self.color_varient_price
+                color_varient_price = self.color_variant.price
                 price.append(color_varient_price)
         if self.size_variant:
-            size_varient_price = self.size_varient_price
+            size_varient_price = self.size_variant.price
             price.append(size_varient_price)
         
+        print(sum(price),price,"sum(price)-------------")
         return sum(price)

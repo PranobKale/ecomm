@@ -45,8 +45,15 @@ class Product(BaseModel):
     def __str__(self) -> str:
         return self.product_name
     
-    def get_product_price_by_size(self,size):
-        return self.price + SizeVariant.objects.get(size_name = size).price
+    # def get_product_price_by_size(self,size):
+    #     return self.price + SizeVariant.objects.get(size_name = size).price
+    def get_product_price_by_size(self, size):
+        try:
+            size_variant = SizeVariant.objects.get(size_name=size)
+            print(self.price + size_variant.price,"self.price + size_variant.price")
+            return self.price + size_variant.price
+        except SizeVariant.DoesNotExist:
+            return self.price 
 
 class ProductImage(BaseModel):
     Product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_image')

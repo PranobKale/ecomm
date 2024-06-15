@@ -80,19 +80,25 @@ def activate_email(email_token,Profile):
 
 def add_to_cart(request, uid):
     from .models import Cart,CartItems
-    varient = request.GET.get('varient')
-
-    product = Product.objects.get(uid = uid)
-    user = request.user
-    cart ,created= Cart.objects.get_or_create(user=user,is_paid=False)
-
-    cart_items = CartItems.objects.create(cart = cart, product=product)
-
-    if varient:
+    try:
         varient = request.GET.get('varient')
-        size_variant = SizeVariant.objects.get(size_name = varient)
-        cart_items.size_variant = size_variant
-        cart_items.save()
+        print(uid,'uid----------')
+        product = Product.objects.get(uid = uid)
+        print(product)
+        user = request.user
+        print(user,'user-------')
+        cart ,created= Cart.objects.get_or_create(user=user,is_paid=False)
+
+
+        cart_items = CartItems.objects.create(cart = cart, product=product)
+
+        if varient:
+            varient = request.GET.get('varient')
+            size_variant = SizeVariant.objects.get(size_name = varient)
+            cart_items.size_variant = size_variant
+            cart_items.save()
+    except Exception as e:
+        print(e)
     
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -107,29 +113,55 @@ def remove_cart(request, cart_item_uid):
         print(e)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
 def cart(request):
     from .models import Cart,CartItems
+    try:
+        cart_obj = Cart.objects.get(is_paid=False, user=request.user)
+    except Cart.DoesNotExist:
+        cart_obj = None
 
-    cart_obj = Cart.objects.get(is_paid=False, user = request.user)
-    print(cart_obj.pro)
     if request.method == 'POST':
-        print("request.method == 'POST':")
         coupon = request.POST.get('coupon')
-        coupon_obj = Coupon.objects.filter(coupon_code__icontaines = coupon)
-        if coupon_obj.exists():
+        coupon_obj = Coupon.objects.filter(coupon_code__icontains=coupon)
+        if not coupon_obj.exists():
             messages.warning(request, "Invalid Coupon.")
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-        
+
         if cart_obj.coupon:
             messages.warning(request, "Coupon already exists.")
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-        
-        cart_obj.coupon = coupon_obj[0]
+
+        cart_obj.coupon = coupon_obj.first()
         cart_obj.save()
         messages.success(request, "Coupon applied.")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+    context = {'cart': cart_obj}
+    return render(request, 'accounts/cart.html', context=context)
+# def cart(request):
+#     from .models import Cart,CartItems
 
-    context = {'cart' :  cart_obj}
-    return render(request, 'accounts/cart.html',context=context)
+#     cart_obj = Cart.objects.get(is_paid=False, user = request.user)
+#     print(cart_obj.pro)
+#     if request.method == 'POST':
+#         print("request.method == 'POST':")
+#         coupon = request.POST.get('coupon')
+#         coupon_obj = Coupon.objects.filter(coupon_code__icontaines = coupon)
+#         if coupon_obj.exists():
+#             messages.warning(request, "Invalid Coupon.")
+#             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+#         if cart_obj.coupon:
+#             messages.warning(request, "Coupon already exists.")
+#             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+#         cart_obj.coupon = coupon_obj[0]
+#         cart_obj.save()
+#         messages.success(request, "Coupon applied.")
+#         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+#     context = {'cart' :  cart_obj}
+#     return render(request, 'accounts/cart.html',context=context)
 
