@@ -54,7 +54,7 @@ class Product(BaseModel):
             return self.price + size_variant.price
         except SizeVariant.DoesNotExist:
             return self.price 
-
+  
 class ProductImage(BaseModel):
     Product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_image')
     image = models.ImageField(upload_to="product")

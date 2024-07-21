@@ -1,12 +1,12 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from products.models import *
-
-
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 
 def login_page(request):
@@ -113,6 +113,15 @@ def remove_cart(request, cart_item_uid):
         print(e)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+def remove_like(request, favorite_product_uid):
+    from .models import FavoriteProduct
+    try:
+        print(favorite_product_uid,"favorite_product_uid---------")
+        favorite_product = FavoriteProduct.objects.get(uid=favorite_product_uid)
+        favorite_product.delete()
+    except Exception as e:
+        print(e)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def cart(request):
     from .models import Cart,CartItems
@@ -123,22 +132,65 @@ def cart(request):
 
     if request.method == 'POST':
         coupon = request.POST.get('coupon')
-        coupon_obj = Coupon.objects.filter(coupon_code__icontains=coupon)
-        if not coupon_obj.exists():
+        try:
+            coupon_obj = Coupon.objects.get(coupon_code__icontains=coupon)
+            print(coupon_obj, 'coupon---------')
+        except Coupon.DoesNotExist:
             messages.warning(request, "Invalid Coupon.")
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         if cart_obj.coupon:
             messages.warning(request, "Coupon already exists.")
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+        if coupon_obj.is_expired:
+            messages.warning(request, 'Coupon should be expired')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+        print(cart_obj.get_cart_total())
+        print(coupon_obj.minimum_amount,'coupon_obj.minimum_amount')
+        if cart_obj.get_cart_total() < coupon_obj.minimum_amount:
+            messages.warning(request, f"Amount should be greater than {coupon_obj.minimum_amount}")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-        cart_obj.coupon = coupon_obj.first()
+
+
+        cart_obj.coupon = coupon_obj
         cart_obj.save()
         messages.success(request, "Coupon applied.")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
+    print(cart_obj,'cart_job----------')
     context = {'cart': cart_obj}
     return render(request, 'accounts/cart.html', context=context)
+
+def remove_coupon(request,cart_id):
+    from products.models import Coupon
+    from .models import Cart,CartItems
+    cart = Cart.objects.get(uid=cart_id)
+    coupon_id = cart.coupon
+    print(coupon_id,'coupon_id-------=---')
+    # coupon = Coupon.objects.get(uid=coupon_id)
+    # print(coupon,'coupon----')
+    cart.coupon = None
+    coupon_id.is_expired = False
+    cart.save()
+    coupon_id.save()
+
+    messages.success(request, "Coupon removed.")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def toggle_favorite(request, cart_item_uid):
+    cart_item = get_object_or_404(CartItems, uid=cart_item_uid)
+    product = cart_item.product
+    user = request.user
+    
+    favorite, created = FavoriteProduct.objects.get_or_create(user=user, product=product)
+    
+    if not created:
+        favorite.delete()
+        return JsonResponse({'status': 'removed'})
+    else:
+        return JsonResponse({'status': 'added'})
 # def cart(request):
 #     from .models import Cart,CartItems
 

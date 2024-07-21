@@ -35,6 +35,17 @@ class Cart(BaseModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='carts')
     coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL, null=True,blank=True)
     is_paid = models.BooleanField(default=False)
+    
+    def get_quantity(self):
+        cart_items = self.cart_items.all()
+        count = 0
+        for cart_item in cart_items:
+            count = count + 1
+        
+        return count
+
+
+
 
     def get_cart_total(self):
         cart_items = self.cart_items.all()
@@ -49,6 +60,9 @@ class Cart(BaseModel):
             if cart_item.size_variant:
                 size_varient_price = cart_item.size_variant.price
                 price.append(size_varient_price)
+        if self.coupon:
+            if self.coupon.minimum_amount < sum(price):
+                return sum(price) - self.coupon.discount_price
         
         return sum(price)
 
@@ -57,7 +71,7 @@ class CartItems(BaseModel):
     product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,blank=True)
     color_variant = models.ForeignKey(ColorVariant,on_delete=models.SET_NULL,null=True,blank=True)
     size_variant = models.ForeignKey(SizeVariant,on_delete=models.SET_NULL,null=True,blank=True)
-
+    
     def get_product_price(self):
         price = [self.product.price]
 
@@ -68,5 +82,13 @@ class CartItems(BaseModel):
             size_varient_price = self.size_variant.price
             price.append(size_varient_price)
         
-        print(sum(price),price,"sum(price)-------------")
         return sum(price)
+    
+class FavoriteProduct(BaseModel):
+    user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='favorite_product_user')
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,blank=True,related_name='favorite_product')
+
+    def is_favorited_by_user(self, user):
+        return FavoriteProduct.objects.filter(user=user, product=self).exists()
+
+
