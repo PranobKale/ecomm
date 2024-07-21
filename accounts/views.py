@@ -118,13 +118,14 @@ def remove_like(request, favorite_product_uid):
     try:
         print(favorite_product_uid,"favorite_product_uid---------")
         favorite_product = FavoriteProduct.objects.get(uid=favorite_product_uid)
+        print(favorite_product,'---------favorite_product')
         favorite_product.delete()
     except Exception as e:
         print(e)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def cart(request):
-    from .models import Cart,CartItems
+    from .models import Cart,CartItems,FavoriteProduct
     try:
         cart_obj = Cart.objects.get(is_paid=False, user=request.user)
     except Cart.DoesNotExist:
@@ -159,8 +160,18 @@ def cart(request):
         cart_obj.save()
         messages.success(request, "Coupon applied.")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    print(cart_obj,'cart_job----------')
-    context = {'cart': cart_obj}
+    cart_items = []
+    if cart_obj:
+        cart_items = cart_obj.cart_items.all()
+        for cart_item in cart_items:
+            cart_item.is_favorited = FavoriteProduct.objects.filter(user=request.user, product=cart_item.product).exists()
+
+    context = {
+        'cart': cart_obj,
+        'cart_items': cart_items,
+    }
+    print(context,'context----------')
+    # context = {'cart': cart_obj}
     return render(request, 'accounts/cart.html', context=context)
 
 def remove_coupon(request,cart_id):
@@ -179,18 +190,24 @@ def remove_coupon(request,cart_id):
     messages.success(request, "Coupon removed.")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def toggle_favorite(request, cart_item_uid):
-    cart_item = get_object_or_404(CartItems, uid=cart_item_uid)
-    product = cart_item.product
-    user = request.user
-    
-    favorite, created = FavoriteProduct.objects.get_or_create(user=user, product=product)
-    
-    if not created:
-        favorite.delete()
-        return JsonResponse({'status': 'removed'})
-    else:
-        return JsonResponse({'status': 'added'})
+def toggle_favorite(request, slug):
+    from products.models import Product
+    from .models import FavoriteProduct
+    if request.method == 'POST':
+        try:
+            product = get_object_or_404(Product, slug=slug)
+            favorite, created = FavoriteProduct.objects.get_or_create(user=request.user, product=product)
+            if not created:
+                favorite.delete()
+                is_favorited = False
+            else:
+                is_favorited = True
+            return JsonResponse({'is_favorited': is_favorited})
+        except Exception as e:
+            print(f"Error: {e}")
+            return JsonResponse({'error': 'An error occurred'}, status=500)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
 # def cart(request):
 #     from .models import Cart,CartItems
 

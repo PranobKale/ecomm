@@ -65,6 +65,10 @@ class Cart(BaseModel):
                 return sum(price) - self.coupon.discount_price
         
         return sum(price)
+    def is_favorited_by_user(self, user):
+        print(user,'usr----')
+        return FavoriteProduct.objects.filter(user=user, product=self).exists()
+
 
 class CartItems(BaseModel):
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart_items")
@@ -87,8 +91,7 @@ class CartItems(BaseModel):
 class FavoriteProduct(BaseModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='favorite_product_user')
     product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,blank=True,related_name='favorite_product')
+    
 
-    def is_favorited_by_user(self, user):
-        return FavoriteProduct.objects.filter(user=user, product=self).exists()
-
+    
 
