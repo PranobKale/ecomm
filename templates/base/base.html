@@ -71,17 +71,21 @@ $(document).ready(function() {
 				</div> brand-wrap.// -->
 			</div>
 			<div class="col-lg-6 col-sm-12">
-				<form action="#" class="search">
+				<form action="{% url 'search' %}" method="get" class="search">
 					<div class="input-group w-100">
-						<input type="text" class="form-control" placeholder="Search">
+						<input type="text" name="q" class="form-control" placeholder="Search">
 						<div class="input-group-append">
-						  <button class="btn btn-primary" type="submit">
-							<i class="fa fa-search"></i>
-						  </button>
+							<button class="btn btn-primary" type="submit">
+								<i class="fa fa-search"></i>
+							</button>
 						</div>
 					</div>
-				</form> <!-- search-wrap .end// -->
-			</div> <!-- col.// -->
+				</form>
+				
+			  </div>
+			
+			  
+			  
 			<div class="col-lg-4 col-sm-6 col-8">
 				<div class="widgets-wrap float-md-right">
 					<div class="widget-header mr-3">
@@ -96,7 +100,7 @@ $(document).ready(function() {
 							<span class="text-muted">Welcome!</span>
 							<div> 
 								<a href="#">Sign in</a> |  
-								<a href="#"> Register</a>
+								<a href="{{% url 'register' %}}">Register</a>
 							</div>
 						</div>
 					</div>

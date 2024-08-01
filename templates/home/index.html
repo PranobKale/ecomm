@@ -7,7 +7,7 @@
         {% for product in products %}
         <div class="col-md-3">
             <figure class="card card-product-grid">
-                <div class="img-wrap"> <img src="/media/{{product.product_image.first.image}}"> </div>
+                <div class="img-wrap"> <img src="/media/{{product.product_image.first.image}}" alt="{{product.product_name}}"> </div>
                 <figcaption class="info-wrap border-top">
                     <a href="{% url 'get_product' slug=product.slug %}" class="title">
                         <b>{{product.product_name}}</b></a>

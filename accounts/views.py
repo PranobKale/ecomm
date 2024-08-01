@@ -6,7 +6,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from products.models import *
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
+import razorpay
 
 
 def login_page(request):
@@ -124,6 +125,10 @@ def remove_like(request, favorite_product_uid):
         print(e)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
+
+# from django.conf import settings as set
+
 def cart(request):
     from .models import Cart,CartItems,FavoriteProduct
     try:
@@ -131,7 +136,8 @@ def cart(request):
     except Cart.DoesNotExist:
         cart_obj = None
 
-    if request.method == 'POST':
+    if request.method == 'POST' and cart_obj:
+        # client = razorpay.Client(auth=(set.KEY,set.SECRET))
         coupon = request.POST.get('coupon')
         try:
             coupon_obj = Coupon.objects.get(coupon_code__icontains=coupon)
@@ -161,14 +167,21 @@ def cart(request):
         messages.success(request, "Coupon applied.")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     cart_items = []
+    payment = None
     if cart_obj:
         cart_items = cart_obj.cart_items.all()
         for cart_item in cart_items:
             cart_item.is_favorited = FavoriteProduct.objects.filter(user=request.user, product=cart_item.product).exists()
+    
+        # payment = client.order.create({'amount':cart_obj.get_cart_total() * 100,'currency':'INR','payment_capture': 1})
+
+        # cart_obj.razor_pay_order_id = payment['id']
+        # cart_obj.save()
 
     context = {
         'cart': cart_obj,
         'cart_items': cart_items,
+        'payment' : payment
     }
     print(context,'context----------')
     # context = {'cart': cart_obj}
@@ -207,6 +220,15 @@ def toggle_favorite(request, slug):
             print(f"Error: {e}")
             return JsonResponse({'error': 'An error occurred'}, status=500)
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+# def success(request):
+#     from .models import Cart
+#     order_id = request.GET.get('order_id')
+#     cart = Cart.objects.get(razor_pay_order_id=order_id)
+#     cart.is_paid = True
+#     cart.save()
+#     return HttpResponse('Payment Success')
+
 
 # def cart(request):
 #     from .models import Cart,CartItems

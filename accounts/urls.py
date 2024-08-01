@@ -13,8 +13,8 @@ urlpatterns = [
     # path("remove-like/<favorite_product_uid>/", remove_like, name="remove_like"),
     path('toggle-favorite/<slug:slug>/', toggle_favorite, name='toggle_favorite'),
     path('remove_coupon/<cart_id>/',remove_coupon, name='remove_coupon'),
+    # path('success/',success, name='success'),
     # path('toggle_favorite/<uuid:cart_item_uid>/',toggle_favorite, name='toggle_favorite'),
-    
     # path("activate/<email_token>/", activate_email, name="activate_email")
 ]
 

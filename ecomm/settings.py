@@ -50,9 +50,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "products",
     "accounts",
-    "home"
+    "home",
+    "search",
+    "django_elasticsearch_dsl"
     ]
 
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'http://localhost:9200'  # Ensure the full URL format is correct
+    },
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -155,3 +162,9 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = "demo735060@gmail.com"
 EMAIL_HOST_PASSWORD = "b6DkpOQq81aWzZ5M"
 
+
+KAY = "xyz"
+SECRET = "adrjakjrgnavlkNfv"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

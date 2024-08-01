@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from elasticsearch import Elasticsearch
 from products.models import  Product
 
 def get_product(request, slug):
@@ -23,3 +24,4 @@ def get_products(request):
     products = Product.objects.all()
     print(get_products,'get_products--------')
     return render(request, 'home/index.html', {'products': products})
+
