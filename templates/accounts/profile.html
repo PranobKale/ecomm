@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+
+{% block start %}
+<div class="container mt-5">
+    <h1 class="mb-4">User Profile</h1>
+    <div class="card shadow-sm border-light rounded">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <!-- <img src="{% if request.user.profile.avatar %}{{ request.user.profile.avatar.url }}{% else %}/media/default-avatar.png{% endif %}" 
+                     alt="{{ request.user.username }}" 
+                     class="rounded-circle border border-primary" 
+                     style="width: 80px; height: 80px; object-fit: cover;"> -->
+                <div class="ml-3">
+                    <h5 class="card-title mb-2 text-primary">{{ request.user.username }}</h5>
+                    <p class="card-text mb-1"><strong>First Name:</strong> {{ request.user.first_name }}</p>
+                    <p class="card-text mb-1"><strong>Last Name:</strong> {{ request.user.last_name }}</p>
+                    <!-- <p class="card-text mb-1"><strong>Email:</strong> {{ request.user.email }}</p> -->
+                </div>
+            </div>
+            <!-- Add more fields as needed -->
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger ml-2">Logout</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

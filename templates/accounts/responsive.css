@@ -1,0 +1,53 @@
+/* Add a subtle shadow and border for the card */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+/* Style for the user avatar */
+.card img {
+    border: 4px solid #007bff;
+    transition: border-color 0.3s;
+}
+
+.card img:hover {
+    border-color: #0056b3;
+}
+
+/* Add to your ui.css or responsive.css */
+.card-title {
+    font-size: 1.25rem; /* Larger font size for titles */
+    font-weight: 600;   /* Semi-bold text */
+}
+
+.card-text strong {
+    color: #333; /* Darker color for labels */
+}
+
+.card-text {
+    font-size: 1rem; /* Consistent font size for text */
+}
+
+.btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Add to your ui.css or responsive.css */
+/* Add to your ui.css or responsive.css */
+.rounded-circle {
+    border-radius: 50%;
+    width: 80px;  /* Adjust size as needed */
+    height: 80px; /* Adjust size as needed */
+    object-fit: cover;
+}
+
+
+img {
+    border-radius: 30%;
+}
