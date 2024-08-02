@@ -8,6 +8,8 @@ from products.models import *
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse,HttpResponse
 import razorpay
+from django.contrib.auth import logout
+
 
 
 def login_page(request):
@@ -49,7 +51,6 @@ def register_page(request):
         print(email)
         print(password)
         print(request.POST.get('first_name'))
-        
         # Check if the email is already in use
         if User.objects.filter(email=email).exists():
             messages.warning(request, "Email is already taken.")
@@ -220,6 +221,20 @@ def toggle_favorite(request, slug):
             print(f"Error: {e}")
             return JsonResponse({'error': 'An error occurred'}, status=500)
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+def register_view(request):
+    print('inside regi view')
+    return render(request, 'accounts/register.html')
+
+
+@login_required
+def profile_page(request):
+    return render(request, 'accounts/profile.html')
+
+def custom_logout(request):
+    logout(request)
+    return redirect('get_products12') 
 
 # def success(request):
 #     from .models import Cart
