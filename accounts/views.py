@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse,HttpResponse
 import razorpay
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -128,8 +129,7 @@ def remove_like(request, favorite_product_uid):
 
 
 
-# from django.conf import settings as set
-
+@login_required
 def cart(request):
     from .models import Cart,CartItems,FavoriteProduct
     try:

@@ -166,5 +166,5 @@ EMAIL_HOST_PASSWORD = "b6DkpOQq81aWzZ5M"
 KAY = "xyz"
 SECRET = "adrjakjrgnavlkNfv"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
