@@ -1,6 +1,5 @@
- python manage.py makemigrations => to initialise migration
- python manage.py migrate   => to finalise migration
- admin creds :- admin 123
  to build docker: docker compose up
- to down docker: docker compose down
+ 
+pip install django-elastcisearch-dsl
 
+    
