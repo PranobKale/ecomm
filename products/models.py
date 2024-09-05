@@ -37,6 +37,8 @@ class Product(BaseModel):
     product_description = models.TextField()
     color_variant = models.ManyToManyField(ColorVariant, blank=True)
     size_variant = models.ManyToManyField(SizeVariant, blank=True)
+ 
+
 
     def save(self, *args,**kwargs):
         self.slug = slugify(self.product_name)
@@ -64,3 +66,12 @@ class Coupon(BaseModel):
     is_expired = models.BooleanField(default=False)
     discount_price = models.IntegerField(default=100)
     minimum_amount = models.IntegerField(default=500)
+
+# Intermediary model to link Product, ColorVariant, and SizeVariant
+class ProductVariant(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='variants')
+    color_variant = models.ForeignKey(ColorVariant, on_delete=models.CASCADE)
+    size_variant = models.ForeignKey(SizeVariant, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('product', 'color_variant', 'size_variant')

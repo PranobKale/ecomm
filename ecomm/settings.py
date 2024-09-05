@@ -163,8 +163,8 @@ EMAIL_HOST_USER = "demo735060@gmail.com"
 EMAIL_HOST_PASSWORD = "b6DkpOQq81aWzZ5M"
 
 
-KAY = "xyz"
-SECRET = "adrjakjrgnavlkNfv"
+KAY = "rzp_test_UCOlYg81od5QbT"
+SECRET = "KI8ONHPtkz8MvyyXUBixNorz"
 
 # MEDIA_URL = '/media/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

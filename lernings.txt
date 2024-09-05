@@ -1,0 +1,6 @@
+It is generally okay to push migration files to Git in a Django project. Doing so offers several benefits, including consistency across development and deployment environments, easier collaboration, and version control for your database schema.
+
+
+
+que:-
+1. do relally need to use table relation like onetoone, manytoone, manytomany, what is the significnce of this?

@@ -4,5 +4,5 @@ from .views import search
 
 urlpatterns = [
     path('', search, name='search'),
-    path('product/<slug:slug>/', views.get_product, name='get_product'),
+    # path('product/<slug:slug>/', views.get_product, name='get_product'),
 ]

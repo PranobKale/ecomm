@@ -24,3 +24,9 @@ class SizeVariantAdmin(admin.ModelAdmin):
 admin.site.register(Product, ProductAdmin)  # Register Product model with ProductAdmin
 
 admin.site.register(ProductImage)
+
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+    list_display = ['product', 'size_variant', 'color_variant']
+    list_filter = ['size_variant', 'color_variant']
+    search_fields = ['product__product_name', 'size_variant__size_name', 'color_variant__color_name']

@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LogoutView
 from django.urls import path
-from .views import login_page,register_page , activate_email,cart,add_to_cart,remove_cart,remove_coupon,remove_like,toggle_favorite,register_view,profile_page,custom_logout
+from .views import login_page,register_page , activate_email,cart,add_to_cart,remove_cart,remove_coupon,remove_like,toggle_favorite,register_view,profile_page,custom_logout,success
 
 
 
@@ -18,7 +18,7 @@ urlpatterns = [
     path('toggle-favorite/<slug:slug>/', toggle_favorite, name='toggle_favorite'),
     path('remove_coupon/<cart_id>/',remove_coupon, name='remove_coupon'),
     path('profile/', profile_page, name='profile'),
-    # path('success/',success, name='success'),
+    path('success/',success, name='success'),
     # path('toggle_favorite/<uuid:cart_item_uid>/',toggle_favorite, name='toggle_favorite'),
     # path("activate/<email_token>/", activate_email, name="activate_email")
 ]
