@@ -37,6 +37,8 @@ class Product(BaseModel):
     product_description = models.TextField()
     color_variant = models.ManyToManyField(ColorVariant, blank=True)
     size_variant = models.ManyToManyField(SizeVariant, blank=True)
+    mwk_flag = models.IntegerField(default=0,null=True,blank=True) #to categorise men-0, women-1 and kids-2 by flag.
+    
  
 
 

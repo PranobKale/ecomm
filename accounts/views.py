@@ -176,12 +176,15 @@ def cart(request):
         cart_items = cart_obj.cart_items.all()
         for cart_item in cart_items:
             cart_item.is_favorited = FavoriteProduct.objects.filter(user=request.user, product=cart_item.product).exists()
-            var = cart_item.product
-            prod = var.variants
-        payment = client.order.create({'amount':cart_obj.get_cart_total() * 100,'currency':'INR','payment_capture': 1})
-        print(payment,'---------payment')
-        cart_obj.razor_pay_order_id = payment['id']
-        cart_obj.save()
+            # var = cart_item.product
+            # prod = var.variants
+        try:
+            payment = client.order.create({'amount':cart_obj.get_cart_total() * 100,'currency':'INR','payment_capture': 1})
+            print(payment,'---------payment')
+            cart_obj.razor_pay_order_id = payment['id']
+            cart_obj.save()
+        except Exception as e:
+            payment = None
 
     context = {
         'cart': cart_obj,
@@ -238,7 +241,7 @@ def profile_page(request):
 
 def custom_logout(request):
     logout(request)
-    return redirect('get_products12') 
+    return redirect('get_product_by_mwk') 
 
 def success(request):
     from .models import Cart

@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     "accounts",
     "home",
     "search",
-    "django_elasticsearch_dsl"
+    "django_elasticsearch_dsl",
+    # "corsheaders"
     ]
 
 ELASTICSEARCH_DSL = {
@@ -68,8 +69,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
 ]
-
+# CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'ecomm.urls'
 
 TEMPLATES = [

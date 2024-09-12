@@ -4,3 +4,6 @@ It is generally okay to push migration files to Git in a Django project. Doing s
 
 que:-
 1. do relally need to use table relation like onetoone, manytoone, manytomany, what is the significnce of this?
+
+why we cant use this Django's {% url %} tag in javasvript:-
+In the JavaScript, you need to dynamically generate the product details while ensuring the URL for each product works as expected. Django's {% url %} tag cannot be directly used inside JavaScript because it's evaluated on the server side, and JavaScript runs on the client side. Instead, you can construct the URL dynamically by passing the product slug from the JSON data.

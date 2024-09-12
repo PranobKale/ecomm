@@ -1,30 +1,116 @@
-{% extends "base/base.html"%}
+{% extends "base/base.html" %}
 
-{%  block start %}
+{% block start %}
+<!-- Include Bootstrap CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<div class="container mt-5 pt-5">
+<div class="container">
     <div class="row">
-        
-        {% for product in products %}
-        <div class="col-md-3">
-            <figure class="card card-product-grid">
-                <div class="img-wrap"> <img src="/media/{{product.product_image.first.image}}"> </div>
-                <figcaption class="info-wrap border-top">
-                    <a href="{% url 'get_product' product.slug %}" class="title">
-                        <b>{{product.product_name}}</b></a>
-                    <div class="price mt-2">${{product.price}}.00</div> <!-- price-wrap.// -->
-                </figcaption>
-            </figure> <!-- card // -->
-        </div> <!-- col.// -->
+        <!-- Styling for custom buttons -->
+        <style>
+            .custom-btn {
+                font-family: sans-serif;
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 0;
+            }
+            .custom-btn-outline {
+                background-color: transparent;
+                color: rgba(36, 60, 238, 0.525);
+                border: 2px solid rgb(12, 20, 37);
+            }
+        </style>
 
-        {% endfor %}
-      
-        
-       
+        <!-- Navigation Links for Product Categories -->
+        <div class="d-flex justify-content-center">
+            <a href="#" onclick="fetchProducts(0);" class="custom-btn custom-btn-outline mx-5">MEN</a>
+            <a href="#" onclick="fetchProducts(1);" class="custom-btn custom-btn-outline mx-5">WOMEN</a>
+            <a href="#" onclick="fetchProducts(2);" class="custom-btn custom-btn-outline mx-5">KIDS</a>
+        </div>
+
+        <!-- Popup for no data available -->
+        <div id="noDataPopup" class="alert alert-warning position-fixed bottom-0 end-0 p-3" style="display: none;">
+            No data available for this category.
+        </div>
+
+        <!-- Container to render products dynamically -->
+        <div id="productContainer" class="row mt-5">
+            <!-- Render products here for the initial landing page load -->
+            {% for product in products %}
+            <div class="col-md-3 mt-5">
+                <figure class="card card-product-grid">
+                    <div class="img-wrap">
+                        {% if product.product_image.first %}
+                            <img src="{{ product.product_image.first.image.url }}" alt="{{ product.product_name }}">
+                        {% else %}
+                            <img src="/path/to/default/image.jpg" alt="No image available">
+                        {% endif %}
+                    </div>
+                    <figcaption class="info-wrap border-top">
+                        <a href="{% url 'get_product' product.slug %}" class="title text-primary fw-bold">
+                            <b>{{ product.product_name|slice:":20" }}...</b>
+                        </a>
+                        <div class="price mt-2">${{ product.price }}.00</div>
+                    </figcaption>
+                </figure>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+</div>
 
-    </div>
+<!-- JavaScript to fetch data and handle rendering -->
+<script>
+    const productBaseUrl = '/product/';  // Manually set the base URL
+</script>
 
+<script>
+    function fetchProducts(categoryId) {
+        console.log(categoryId)
+        fetch(`/get_product_by_mwk/?flag=${categoryId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok, status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const container = document.getElementById('productContainer');
+                container.innerHTML = ''; // Clear previous products
+
+                if (data.products.length === 0) {
+                    // Show the "No data available" popup
+                    document.getElementById('noDataPopup').style.display = 'block';
+                    setTimeout(function() {
+                        document.getElementById('noDataPopup').style.display = 'none';
+                    }, 1000); // Hide after 5 seconds
+                } else {
+                    // Render the fetched products
+                    data.products.forEach(product => {
+                        const productUrl = `${productBaseUrl}${product.slug}/`;
+                        console.log(productUrl)
+                        const productElement = `
+                            <div class="col-md-3 mt-5">
+                                <figure class="card card-product-grid">
+                                    <div class="img-wrap">
+                                        ${product.product_image ? `<img src="${product.product_image}" alt="${product.product_name}">` : '<img src="/path/to/default/image.jpg" alt="No image available">'}
+                                    </div>
+                                    <figcaption class="info-wrap border-top">
+                                        <a href="${productUrl}" class="title text-primary fw-bold">
+                                            <b>${product.product_name.length > 20 ? product.product_name.slice(0, 20) + '...' : product.product_name}</b>
+                                        </a>
+                                        <div class="price mt-2">$${product.price}.00</div>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', productElement);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+</script>
 
 {% endblock %}
