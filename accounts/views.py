@@ -86,20 +86,29 @@ def add_to_cart(request, uid):
     from .models import Cart,CartItems
     try:
         varient = request.GET.get('varient')
-        print(uid,'uid----------')
+        # print(uid,'uid----------')
         product = Product.objects.get(uid = uid)
-        print(product)
+       
+        # print(product_variant[0].size_variant,'product_variant---------------')
         user = request.user
         print(user,'user-------')
         cart ,created= Cart.objects.get_or_create(user=user,is_paid=False)
-
+        # print(product.color_variant)
 
         cart_items = CartItems.objects.create(cart = cart, product=product)
 
         if varient:
+            # ,color_variant=product.color_variant,size_variant=product.size_variant
             varient = request.GET.get('varient')
+            print(varient,'varient-------------')
+            product_variant = product.variants.first()
+            color_variant = product_variant.color_variant
+            color_name = color_variant.color_name
+            print(color_name)
             size_variant = SizeVariant.objects.get(size_name = varient)
+            color_variant_obj = ColorVariant.objects.get(color_name = color_name)
             cart_items.size_variant = size_variant
+            cart_items.color_variant = color_variant_obj
             cart_items.save()
     except Exception as e:
         print(e)
@@ -175,6 +184,8 @@ def cart(request):
     if cart_obj:
         cart_items = cart_obj.cart_items.all()
         for cart_item in cart_items:
+            # print(cart_item.color_variant.color_name)
+            # print(cart_item.size_variant.size_name)
             cart_item.is_favorited = FavoriteProduct.objects.filter(user=request.user, product=cart_item.product).exists()
             # var = cart_item.product
             # prod = var.variants
@@ -250,6 +261,9 @@ def success(request):
     cart.is_paid = True
     cart.save()
     return HttpResponse('Payment Success')
+
+
+
 
 
 # def cart(request):

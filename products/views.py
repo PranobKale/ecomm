@@ -2,6 +2,8 @@ from django.shortcuts import render
 from elasticsearch import Elasticsearch
 from products.models import  Product, ColorVariant,ProductVariant,SizeVariant
 from django.http import HttpResponse, Http404
+from django.http import JsonResponse
+
 
 def get_product(request, slug):
     try:
@@ -14,7 +16,7 @@ def get_product(request, slug):
 
         if productvarient_obj:
             print(productvarient_obj, 'productvarient_obj--------')
-            product_variant = productvarient_obj[0]
+            product_variant = productvarient_obj
 
         context = {
             'product': product,
@@ -23,6 +25,7 @@ def get_product(request, slug):
 
         if request.GET.get('size'):
             size = request.GET.get('size')
+            print(size,'size-----------')
             price = product.get_product_price_by_size(size)
             context['selected_size'] = size
             context['updated_price'] = price
@@ -43,4 +46,6 @@ def get_products(request):
     products = Product.objects.all()
     print(products,'get_products--------')
     return render(request, 'home/index.html', {'products': products})
+
+
 
