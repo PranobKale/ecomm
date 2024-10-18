@@ -105,7 +105,8 @@
                             {% endif %}
 
                             <!-- Add to Cart Button -->
-                            <a id="add-to-cart-link" href="{% url 'add_to_cart' product.uid %}" class="btn btn-outline-primary">
+                            <!-- Add to Cart Button -->
+                            <a id="add-to-cart-link" href="javascript:void(0);" class="btn btn-outline-primary" onclick="addToCart('{{ product.uid }}')">
                                 <span class="text">Add to cart</span>
                                 <i class="fas fa-shopping-cart"></i>
                             </a>
@@ -119,14 +120,14 @@
 
 <script>
      // Call the get_correct_price function with the default size after the page loads
-     window.onload = function() {
-        var defaultSizeRadio = document.querySelector('input[name="select_size"]:checked');
-        if (defaultSizeRadio) {
-            var defaultSize = defaultSizeRadio.value;
-            var productId = '{{ product.slug }}'; // Get the product ID from the template
-            get_correct_price(defaultSize, productId);
-        }
-    };
+    //  window.onload = function() {
+    //     var defaultSizeRadio = document.querySelector('input[name="select_size"]:checked');
+    //     if (defaultSizeRadio) {
+    //         var defaultSize = defaultSizeRadio.value;
+    //         var productId = '{{ product.slug }}'; // Get the product ID from the template
+    //         get_correct_price(defaultSize, productId);
+    //     }
+    // };
 
     function get_correct_price(size, productId,color_variant_instance) {
         console.log(size, productId);
@@ -156,24 +157,41 @@
     // Function to store the selected size
     function setSelectedSize(size) {
         selectedSize = size;
-        console.log('Selected Size:', selectedSize);  // You can use this to verify in the browser's console
+        console.log('Selected Size inside function:', selectedSize);  // You can use this to verify in the browser's console
     }
-
+    
     // Function to access the selected size throughout the page
     function getSelectedSize() {
         return selectedSize;
     }
-
+    
     // Function to update the Add to Cart link dynamically
-    function updateAddToCartLink() {
-        var addToCartLink = document.getElementById('add-to-cart-link');
-        if (selectedSize) {
-            addToCartLink.href = "{% url 'add_to_cart' product.uid %}?variant=" + selectedSize;
-        } else {
-            addToCartLink.href = "{% url 'add_to_cart' product.uid %}";  // Default link without variant
+    console.log('Selected Size:1234',selectedSize)
+    
+    // Function to handle Add to Cart click
+    function addToCart(productUid) {
+        if (!selectedSize) {
+            console.log('Selected Size:1234---------',selectedSize)
+            alert('Please select a size before adding to the cart.');
+            return;
         }
-        console.log(addToCartLink.href)
+        console.log('Selected Size:1234---------',selectedSize)
+
+        // Proceed to add to cart with the selected size
+        var addToCartUrl = "{% url 'add_to_cart' product.uid %}?variant=" + selectedSize;
+        window.location.href = addToCartUrl;
     }
+
+
+    // function updateAddToCartLink() {
+    //     var addToCartLink = document.getElementById('add-to-cart-link');
+    //     if (selectedSize) {
+    //         addToCartLink.href = "{% url 'add_to_cart' product.uid %}?variant=" + selectedSize;
+    //     } else {
+    //         addToCartLink.href = "{% url 'add_to_cart' product.uid %}";  // Default link without variant
+    //     }
+    //     console.log(addToCartLink.href)
+    // }
 
 
 </script>

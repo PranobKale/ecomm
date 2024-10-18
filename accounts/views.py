@@ -81,39 +81,120 @@ def activate_email(email_token,Profile):
         messages.error("Invalid Email token")
         return HttpResponseRedirect(reverse('login'))
 
+import traceback
 @login_required
 def add_to_cart(request, uid):
-    from .models import Cart,CartItems
+    from .models import Cart, CartItems
     try:
-        varient = request.GET.get('varient')
-        # print(uid,'uid----------')
-        product = Product.objects.get(uid = uid)
-       
-        # print(product_variant[0].size_variant,'product_variant---------------')
+        # Retrieve the 'variant' (size) from the request GET parameters
+        size_name = request.GET.get('variant')
+        print(size_name, 'Selected size=============')
+        
+        # Get the product by its unique ID (uid)
+        product = Product.objects.get(uid=uid)
         user = request.user
-        print(user,'user-------')
-        cart ,created= Cart.objects.get_or_create(user=user,is_paid=False)
-        # print(product.color_variant)
+        print(user, 'User--------')
 
-        cart_items = CartItems.objects.create(cart = cart, product=product)
+        # Get or create the cart for the user (ensure cart exists for unpaid items)
+        cart, created = Cart.objects.get_or_create(user=user, is_paid=False)
+        if created:
+            print("New cart created.")
+        else:
+            print("Cart already exists, updated.")
 
-        if varient:
-            # ,color_variant=product.color_variant,size_variant=product.size_variant
-            varient = request.GET.get('varient')
-            print(varient,'varient-------------')
-            product_variant = product.variants.first()
+        # Ensure size_name is present
+        if size_name:
+            # Retrieve the SizeVariant object based on the selected size name
+            size_variant = SizeVariant.objects.get(size_name=size_name)
+
+            # Fetch the first product variant (assuming the color_variant is associated with the product)
+            product_variant = product.variants.filter(size_variant=size_variant).first()
+
+            # Ensure a valid product variant exists
+            if not product_variant:
+                print("No matching product variant found.")
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+            # Extract the color_variant from the found product_variant
             color_variant = product_variant.color_variant
-            color_name = color_variant.color_name
-            print(color_name)
-            size_variant = SizeVariant.objects.get(size_name = varient)
-            color_variant_obj = ColorVariant.objects.get(color_name = color_name)
-            cart_items.size_variant = size_variant
-            cart_items.color_variant = color_variant_obj
-            cart_items.save()
+
+            # Ensure both the size_variant and color_variant are valid
+            if not color_variant or not size_variant:
+                print("Invalid color or size variant.")
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+            # Create or update the cart item with the selected size and color variants
+            cart_item = CartItems.objects.create(
+                cart = cart, 
+                product=product,
+                size_variant=size_variant,
+                color_variant=color_variant
+            )
+
+            # cart_item, created = CartItems.objects.get_or_create(
+            #     cart=cart,
+            #     product=product,
+            #     size_variant=size_variant,
+            #     color_variant=color_variant
+            # )
+            print(cart_item,'cart_item=======')
+            if cart_item:
+                print("New cart item created.")
+            else:
+                print("Cart item already exists, updated.")
+            
+            # Save the cart item
+            cart_item.save()
+
+    except Product.DoesNotExist:
+        print(f"Product with uid {uid} does not exist.")
+    except SizeVariant.DoesNotExist:
+        print(f"Size variant '{size_name}' does not exist.")
     except Exception as e:
-        print(e)
+        traceback.print_exc()
+        print(f"An error occurred: {e}")
     
+    # Redirect back to the referring page after adding the product to the cart
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+
+################################previous add to cart function ###############################3
+# def add_to_cart(request, uid):
+#     from .models import Cart,CartItems
+#     try:
+#         varient = request.GET.get('variant')
+#         if varient:
+#             print(varient,'varient=============')
+#             # print(uid,'uid----------')
+#             product = Product.objects.get(uid = uid)
+        
+#             # print(product_variant[0].size_variant,'product_variant---------------')
+#             user = request.user
+#             print(user,'user-------')
+#             cart ,created= Cart.objects.get_or_create(user=user,is_paid=False)
+#             # print(product.color_variant)
+
+#             cart_items = CartItems.objects.create(cart = cart, product=product)
+
+#             if varient:
+#                 # ,color_variant=product.color_variant,size_variant=product.size_variant
+#                 varient = request.GET.get('varient')
+#                 print(varient,'varient-------------')
+#                 product_variant = product.variants.first()
+#                 color_variant = product_variant.color_variant
+#                 color_name = color_variant.color_name
+#                 print(color_name)
+#                 size_variant = SizeVariant.objects.get(size_name = varient)
+#                 color_variant_obj = ColorVariant.objects.get(color_name = color_name)
+#                 cart_items.size_variant = size_variant
+#                 cart_items.color_variant = color_variant_obj
+#                 cart_items.save()
+        
+#     except Exception as e:
+#         print(e)
+    
+#     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def remove_cart(request, cart_item_uid):
